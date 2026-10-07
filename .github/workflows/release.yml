@@ -1,0 +1,74 @@
+name: Draft release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing version tag to build
+        required: true
+        default: v1.0.0
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ inputs.tag || github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: windows-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        shell: pwsh
+    env:
+      RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: '24'
+          package-manager-cache: false
+      - name: Verify tag and release notes
+        run: |
+          $version = (Get-Content package.json -Raw | ConvertFrom-Json).version
+          if ($env:RELEASE_TAG -notmatch '^v\d+\.\d+\.\d+$' -or $env:RELEASE_TAG -ne "v$version") {
+            throw 'The existing tag must match package.json.'
+          }
+          if (-not (Test-Path -LiteralPath "docs/releases/$($env:RELEASE_TAG).md")) {
+            throw 'Release notes are missing.'
+          }
+      - name: Client checks
+        run: npm test
+      - name: Startup and application checks
+        run: powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/Test-Controller.ps1
+      - name: Native checks without network filtering
+        run: powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/Test-Native.ps1
+      - name: Authenticated helper HTTP checks
+        run: powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/Test-Api.ps1
+      - name: Build release packages
+        run: npm run build
+      - name: Create or refresh draft
+        run: |
+          $version = (Get-Content package.json -Raw | ConvertFrom-Json).version
+          $folder = "dist/v$version"
+          $assets = @("$folder/Hayase-BindVPN-Windows.zip", "$folder/Hayase-BindVPN-plugin.zip", "$folder/Hayase-BindVPN-source.zip", "$folder/SHA256SUMS.txt")
+          $notes = "docs/releases/$($env:RELEASE_TAG).md"
+          $existing = gh release view $env:RELEASE_TAG --repo $env:GITHUB_REPOSITORY --json isDraft 2>$null
+          if ($LASTEXITCODE -eq 0) {
+            if (-not ($existing | ConvertFrom-Json).isDraft) { throw 'This release is published; its assets will not be replaced.' }
+            gh release upload $env:RELEASE_TAG @assets --repo $env:GITHUB_REPOSITORY --clobber
+            if ($LASTEXITCODE -ne 0) { throw 'Draft asset upload failed.' }
+            gh release edit $env:RELEASE_TAG --repo $env:GITHUB_REPOSITORY --draft --title "Hayase BindVPN $version" --notes-file $notes
+          } else {
+            gh release create $env:RELEASE_TAG @assets --repo $env:GITHUB_REPOSITORY --draft --verify-tag --title "Hayase BindVPN $version" --notes-file $notes
+          }
+          if ($LASTEXITCODE -ne 0) { throw 'Draft release creation failed.' }

@@ -1,0 +1,38 @@
+name: Bug report
+description: Report a startup, pairing, adapter, or recovery problem.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: 'Do not include pairing codes, VPN credentials, or personal torrent details. For a suspected security issue, use SECURITY.md.'
+  - type: input
+    id: version
+    attributes:
+      label: Helper and plugin versions
+      placeholder: Both 1.0.0
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Windows version and VPN adapter type
+      placeholder: Windows 11 x64, WireGuard adapter
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem and exact error text
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+    validations:
+      required: true
+  - type: textarea
+    id: test
+    attributes:
+      label: Protection test results
+      description: Include passed, failed, or skipped checks if available.

@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Hayase BindVPN</title>
+  <link rel="stylesheet" href="popup.css">
+  <script type="module" src="popup.js"></script>
+</head>
+<body>
+  <main>
+    <header><span class="eyebrow">HAYASE · NETWORK</span><h1>Bind to your VPN</h1><p>Choose the interface Hayase can use.</p></header>
+    <section class="status" aria-live="polite">
+      <span id="status-dot" class="dot"></span><div><strong id="state">Checking helper…</strong><p id="detail">Connecting to the Windows helper.</p></div>
+    </section>
+    <section id="pair-panel" hidden>
+      <label for="pair-code">Helper pairing code</label>
+      <input id="pair-code" type="password" autocomplete="off" spellcheck="false" placeholder="Paste code from the helper window">
+      <button id="pair" class="primary">Connect helper</button>
+      <p class="hint">Open Hayase-BindVPN-Helper.exe and copy its pairing code. The helper needs administrator access.</p>
+    </section>
+    <section id="controls" hidden>
+      <div class="label-row"><label for="adapter">Network interface</label><button id="refresh" class="text-button">Refresh</button></div>
+      <select id="adapter"><option value="">Choose an interface…</option></select>
+      <p id="adapter-detail" class="hint">Connect your VPN to see its adapter.</p>
+      <div class="switch-row"><label for="binding-toggle">Bind Hayase<span id="switch-detail">Off</span></label><label class="switch"><input id="binding-toggle" type="checkbox" role="switch" aria-label="Bind Hayase to the selected interface"><span class="switch-track"></span></label></div>
+      <p id="app-warning" class="warning" role="alert" hidden>Hayase was not found. Select Hayase.exe in the helper. Binding is disabled until the application is found.</p>
+      <button id="apply-adapter" class="secondary" hidden>Use selected interface</button>
+      <p class="hint">Turning binding off restores normal network access.</p>
+      <button id="test" class="secondary">Test protection</button>
+      <section id="test-result" aria-live="polite" hidden><strong id="test-summary"></strong><ul id="test-checks"></ul></section>
+      <dl><dt>Application</dt><dd id="executable">Choose Hayase.exe in the helper.</dd><dt>Bound interface</dt><dd id="bound-adapter">None</dd></dl>
+    </section>
+    <p id="error" role="alert" hidden></p>
+    <footer>Restricts Hayase only; adapter settings stay unchanged. Keep the helper running. If it stops, an enabled binding stays blocked.</footer>
+  </main>
+</body>
+</html>

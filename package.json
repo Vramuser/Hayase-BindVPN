@@ -1,0 +1,16 @@
+{
+  "name": "hayase-bind-vpn",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Hayase plugin and Windows interface restriction helper",
+  "license": "MIT",
+  "homepage": "https://github.com/Vramuser/Hayase-BindVPN",
+  "repository": { "type": "git", "url": "https://github.com/Vramuser/Hayase-BindVPN.git" },
+  "bugs": { "url": "https://github.com/Vramuser/Hayase-BindVPN/issues" },
+  "scripts": {
+    "test": "node --test tests/*.test.mjs",
+    "build": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/Build.ps1"
+  },
+  "engines": { "node": ">=20" }
+}

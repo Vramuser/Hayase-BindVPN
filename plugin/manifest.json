@@ -1,0 +1,14 @@
+{
+  "manifest_version": 3,
+  "name": "Hayase BindVPN",
+  "version": "1.0.0",
+  "description": "Choose the network interface Hayase may use, with a Windows helper that blocks fallback traffic.",
+  "host_permissions": ["http://127.0.0.1:49736/*"],
+  "action": {
+    "default_title": "Bind Hayase to a VPN interface",
+    "default_popup": "popup.html"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'none'; connect-src http://127.0.0.1:49736"
+  }
+}

@@ -1,0 +1,44 @@
+name: Windows checks
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    runs-on: windows-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: '24'
+          package-manager-cache: false
+      - name: Client checks
+        run: npm test
+      - name: Startup and application checks
+        run: powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/Test-Controller.ps1
+      - name: Native checks without network filtering
+        run: powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/Test-Native.ps1
+      - name: Authenticated helper HTTP checks
+        run: powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/Test-Api.ps1
+      - name: Build release packages
+        run: npm run build
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        with:
+          name: windows-release-packages
+          path: |
+            dist/v*/*.zip
+            dist/v*/SHA256SUMS.txt
+          if-no-files-found: error
+          compression-level: 0

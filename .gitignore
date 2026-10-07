@@ -1,0 +1,11 @@
+.research/
+dist/
+test-output/
+*.user
+node_modules/
+*.log
+.DS_Store
+Thumbs.db
+Desktop.ini
+.tests/
+.test-output/
