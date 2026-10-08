@@ -38,19 +38,7 @@ The plugin runs inside Hayase's sandbox. The included helper enforces the restri
 
 ### Video walkthrough
 
-Watch the setup walkthrough for installing the plugin, pairing the helper, selecting your VPN adapter, and testing protection.
-
-*Video walkthrough coming soon.*
-
-<!-- VIDEO_WALKTHROUGH_PLACEHOLDER
-Replace the "Video walkthrough coming soon." line above with your video.
-
-For a video hosted elsewhere, use:
 [Watch the setup walkthrough](https://r2.e-z.host/ffce6ccc-07ab-4da6-802e-17024bbd93e7/2ybujhe6.mp4)
-
-Or paste your uploaded GitHub video attachment URL on its own line here.
-Remove this comment once the video is added.
--->
 
 ### Written instructions
 
