@@ -66,8 +66,24 @@ try {
     }
 } finally { $sourceArchive.Dispose(); $sourceStream.Dispose() }
 
+function Get-ReleaseSHA256 {
+    param([string]$LiteralPath)
+    $stream = $null
+    $sha256 = $null
+    try {
+        $stream = [System.IO.File]::OpenRead($LiteralPath)
+        $sha256 = [System.Security.Cryptography.SHA256]::Create()
+        # Hash the stream directly so a runner's PowerShell module configuration
+        # cannot prevent checksums from being generated.
+        return [System.BitConverter]::ToString($sha256.ComputeHash($stream)).Replace('-', '').ToLowerInvariant()
+    } finally {
+        if ($null -ne $sha256) { $sha256.Dispose() }
+        if ($null -ne $stream) { $stream.Dispose() }
+    }
+}
+
 $checksums = foreach ($name in @('Hayase-BindVPN-Windows.zip', 'Hayase-BindVPN-plugin.zip', 'Hayase-BindVPN-source.zip')) {
-    $hash = (Get-FileHash -LiteralPath (Join-Path $dist $name) -Algorithm SHA256).Hash.ToLowerInvariant()
+    $hash = Get-ReleaseSHA256 -LiteralPath (Join-Path $dist $name)
     "$hash  $name"
 }
 [System.IO.File]::WriteAllLines((Join-Path $dist 'SHA256SUMS.txt'), [string[]]$checksums, [System.Text.Encoding]::ASCII)
